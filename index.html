@@ -35,20 +35,18 @@ body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text)
 .sec-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 7px 2px}
 .sec-label:first-child{margin-top:2px}
 .card-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.card-opt{border:1.5px solid var(--border);border-radius:var(--rsm);padding:10px 7px;cursor:pointer;background:var(--surface);text-align:center;transition:all .15s}
-.card-opt:active{transform:scale(.97)}
+.card-opt{border:1.5px solid var(--border2);border-radius:var(--rsm);padding:10px 7px;cursor:pointer;background:var(--surface);text-align:center;transition:all .15s;user-select:none;-webkit-user-select:none}
 .card-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-bottom:3px}
 .card-name{font-size:13px;font-weight:700;display:block}
 .card-meta{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.5}
-.sel-hdfc{border-color:var(--hdfc)!important;background:var(--hdfc-bg)!important}
-.sel-hdfc .card-name{color:var(--hdfc-t)}
-.sel-sbi{border-color:var(--sbi)!important;background:var(--sbi-bg)!important}
-.sel-sbi .card-name{color:var(--sbi-t)}
-.sel-onecard{border-color:var(--one)!important;background:var(--one-bg)!important}
-.sel-onecard .card-name{color:var(--one-t)}
+.card-opt.sel-hdfc{border-color:var(--hdfc);background:var(--hdfc-bg)}
+.card-opt.sel-hdfc .card-name{color:var(--hdfc-t)}
+.card-opt.sel-sbi{border-color:var(--sbi);background:var(--sbi-bg)}
+.card-opt.sel-sbi .card-name{color:var(--sbi-t)}
+.card-opt.sel-onecard{border-color:var(--one);background:var(--one-bg)}
+.card-opt.sel-onecard .card-name{color:var(--one-t)}
 .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.cat-opt{border:1px solid var(--border);border-radius:var(--rsm);padding:8px 3px 7px;cursor:pointer;background:var(--surface);text-align:center;font-size:11px;color:var(--text2);font-weight:500;line-height:1.3;transition:all .12s}
-.cat-opt:active{transform:scale(.95)}
+.cat-opt{border:1px solid var(--border2);border-radius:var(--rsm);padding:8px 3px 7px;cursor:pointer;background:var(--surface);text-align:center;font-size:11px;color:var(--text2);font-weight:500;line-height:1.3;user-select:none;-webkit-user-select:none}
 .ci{font-size:17px;display:block;margin-bottom:2px}
 .cat-opt.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent-t)}
 .form-group{margin-bottom:9px}
@@ -111,33 +109,32 @@ body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text)
       <h1>💳 Card Tracker</h1>
       <div class="header-sub" id="hdr-sub"></div>
     </div>
-    <button class="clr-btn" onclick="clearAll()">Clear all</button>
+    <button class="clr-btn" id="clr-btn">Clear all</button>
   </div>
 </div>
 
 <div class="tab-bar">
-  <div class="tab-item active" id="tab-add" onclick="switchTab('add')">Add</div>
-  <div class="tab-item" id="tab-log" onclick="switchTab('log')">Log</div>
-  <div class="tab-item" id="tab-summary" onclick="switchTab('summary')">Summary</div>
+  <div class="tab-item active" id="tab-add">Add</div>
+  <div class="tab-item" id="tab-log">Log</div>
+  <div class="tab-item" id="tab-summary">Summary</div>
 </div>
 
 <div class="content">
-
   <!-- ADD TAB -->
   <div class="view active" id="view-add">
     <div class="sec-label">Select card</div>
     <div class="card-row">
-      <div class="card-opt" id="co-hdfc" onclick="pickCard('hdfc')">
+      <div class="card-opt" id="co-hdfc">
         <span class="card-dot" style="background:var(--hdfc)"></span>
         <span class="card-name">HDFC</span>
         <div class="card-meta">Stmt: 2nd<br>Due: 22nd</div>
       </div>
-      <div class="card-opt" id="co-sbi" onclick="pickCard('sbi')">
+      <div class="card-opt" id="co-sbi">
         <span class="card-dot" style="background:var(--sbi)"></span>
         <span class="card-name">SBI</span>
         <div class="card-meta">Stmt: 7th<br>Due: 27th</div>
       </div>
-      <div class="card-opt" id="co-onecard" onclick="pickCard('onecard')">
+      <div class="card-opt" id="co-onecard">
         <span class="card-dot" style="background:var(--one)"></span>
         <span class="card-name">OneCard</span>
         <div class="card-meta">Stmt: 22nd<br>Due: 9th↗</div>
@@ -162,17 +159,17 @@ body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text)
         <input class="form-input" type="date" id="inp-date"/>
       </div>
     </div>
-    <button class="add-btn" onclick="addEntry()">+ Add Expense</button>
+    <button class="add-btn" id="add-btn">+ Add Expense</button>
   </div>
 
   <!-- LOG TAB -->
   <div class="view" id="view-log">
     <div class="sec-label">Filter by card</div>
-    <div class="filter-row">
-      <div class="filter-chip active" onclick="setFilter(this,'all')">All</div>
-      <div class="filter-chip" onclick="setFilter(this,'hdfc')">HDFC</div>
-      <div class="filter-chip" onclick="setFilter(this,'sbi')">SBI</div>
-      <div class="filter-chip" onclick="setFilter(this,'onecard')">OneCard</div>
+    <div class="filter-row" id="filter-row">
+      <div class="filter-chip active" data-filter="all">All</div>
+      <div class="filter-chip" data-filter="hdfc">HDFC</div>
+      <div class="filter-chip" data-filter="sbi">SBI</div>
+      <div class="filter-chip" data-filter="onecard">OneCard</div>
     </div>
     <div id="log-list"></div>
   </div>
@@ -190,7 +187,6 @@ body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text)
     <div class="sec-label" style="margin-top:18px">Spending by category</div>
     <div id="cat-prog"></div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -216,23 +212,24 @@ var activeCat = null;
 var logFilter = 'all';
 
 function loadData() {
-  try { entries = JSON.parse(localStorage.getItem('ct_v2') || '[]'); } catch(e) { entries = []; }
+  try { entries = JSON.parse(localStorage.getItem('ct_v3') || '[]'); } catch(e) { entries = []; }
 }
 function saveData() {
-  try { localStorage.setItem('ct_v2', JSON.stringify(entries)); } catch(e) {}
+  try { localStorage.setItem('ct_v3', JSON.stringify(entries)); } catch(e) {}
 }
 
 function pickCard(c) {
   activeCard = c;
   ['hdfc','sbi','onecard'].forEach(function(k) {
     var el = document.getElementById('co-'+k);
-    el.className = 'card-opt' + (k===c ? ' sel-'+k : '');
+    el.className = 'card-opt' + (k === c ? ' sel-'+k : '');
   });
 }
 
 function pickCat(id) {
   activeCat = id;
-  document.querySelectorAll('.cat-opt').forEach(function(e) { e.classList.remove('active'); });
+  var all = document.querySelectorAll('.cat-opt');
+  for (var i = 0; i < all.length; i++) all[i].classList.remove('active');
   var key = id.replace(/[\s&\/]+/g,'_');
   var el = document.getElementById('cat-'+key);
   if (el) el.classList.add('active');
@@ -240,11 +237,23 @@ function pickCat(id) {
 
 function buildCatGrid() {
   var g = document.getElementById('cat-grid');
-  g.innerHTML = CATS.map(function(c) {
+  var html = '';
+  for (var i = 0; i < CATS.length; i++) {
+    var c = CATS[i];
     var key = c.id.replace(/[\s&\/]+/g,'_');
-    return '<div class="cat-opt" id="cat-'+key+'" onclick="pickCat(\''+c.id.replace(/'/g,"\\'")+'\')">'
+    html += '<div class="cat-opt" id="cat-'+key+'" data-cat="'+c.id+'">'
       +'<span class="ci">'+c.icon+'</span>'+c.id+'</div>';
-  }).join('');
+  }
+  g.innerHTML = html;
+
+  // attach events after building
+  var opts = document.querySelectorAll('.cat-opt');
+  for (var j = 0; j < opts.length; j++) {
+    (function(el) {
+      el.addEventListener('click', function() { pickCat(el.getAttribute('data-cat')); });
+      el.addEventListener('touchend', function(e) { e.preventDefault(); pickCat(el.getAttribute('data-cat')); });
+    })(opts[j]);
+  }
 }
 
 function todayStr() {
@@ -252,7 +261,10 @@ function todayStr() {
   return d.toISOString().split('T')[0];
 }
 function fmt(n) { return '₹'+Math.round(n).toLocaleString('en-IN'); }
-function catIcon(id) { var c=CATS.find(function(x){return x.id===id;}); return c?c.icon:'📦'; }
+function catIcon(id) {
+  for (var i=0;i<CATS.length;i++) if (CATS[i].id===id) return CATS[i].icon;
+  return '📦';
+}
 function ordinal(n) { var s=['th','st','nd','rd'],v=n%100; return s[(v-20)%10]||s[v]||s[0]; }
 
 function addEntry() {
@@ -289,10 +301,12 @@ function clearAll() {
   updateHeader();
 }
 
-function setFilter(el, f) {
+function setFilter(f) {
   logFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
-  el.classList.add('active');
+  var chips = document.querySelectorAll('.filter-chip');
+  for (var i=0;i<chips.length;i++) {
+    chips[i].classList.toggle('active', chips[i].getAttribute('data-filter')===f);
+  }
   renderLog();
 }
 
@@ -304,10 +318,12 @@ function renderLog() {
     list.innerHTML = '<div class="empty-state"><div class="ei">📭</div><p>No expenses yet.<br>Add one from the Add tab.</p></div>';
     return;
   }
-  list.innerHTML = data.map(function(e) {
+  var html = '';
+  for (var i=0;i<data.length;i++) {
+    var e = data[i];
     var c = CARDS[e.card] || {};
     var d = e.date ? e.date.split('-').reverse().slice(0,2).join('/') : '';
-    return '<div class="entry-item">'
+    html += '<div class="entry-item">'
       +'<div class="entry-icon">'+catIcon(e.cat)+'</div>'
       +'<div class="entry-body">'
         +'<div class="entry-desc">'+e.desc+'</div>'
@@ -316,49 +332,66 @@ function renderLog() {
       +'</div>'
       +'<div class="entry-right">'
         +'<div class="entry-amt">'+fmt(e.amt)+'</div>'
-        +'<button class="del-btn" onclick="delEntry('+e.id+')">✕ remove</button>'
+        +'<button class="del-btn" data-id="'+e.id+'">✕ remove</button>'
       +'</div></div>';
-  }).join('');
+  }
+  list.innerHTML = html;
+  var delBtns = list.querySelectorAll('.del-btn');
+  for (var j=0;j<delBtns.length;j++) {
+    (function(btn) {
+      btn.addEventListener('click', function() { delEntry(parseInt(btn.getAttribute('data-id'))); });
+    })(delBtns[j]);
+  }
 }
 
 function renderSummary() {
   var totals={hdfc:0,sbi:0,onecard:0}, catT={}, grand=0;
-  entries.forEach(function(e){
+  for (var i=0;i<entries.length;i++) {
+    var e=entries[i];
     totals[e.card]=(totals[e.card]||0)+parseFloat(e.amt);
     catT[e.cat]=(catT[e.cat]||0)+parseFloat(e.amt);
     grand+=parseFloat(e.amt);
-  });
+  }
   document.getElementById('grand-amt').textContent = fmt(grand);
-  document.getElementById('sum-cards').innerHTML = Object.keys(CARDS).map(function(k){
-    var v=CARDS[k];
-    return '<div class="sum-card"><div class="sum-card-label">'+v.label+'</div>'
-      +'<div class="sum-card-amt">'+fmt(totals[k]||0)+'</div>'
+  var sumHtml='';
+  var cardKeys=['hdfc','sbi','onecard'];
+  for (var k=0;k<cardKeys.length;k++) {
+    var key=cardKeys[k], v=CARDS[key];
+    sumHtml+='<div class="sum-card"><div class="sum-card-label">'+v.label+'</div>'
+      +'<div class="sum-card-amt">'+fmt(totals[key]||0)+'</div>'
       +'<div class="sum-card-sub">Due '+v.due+(v.nm?' →':'th')+'</div></div>';
-  }).join('');
-  var day = new Date().getDate();
-  document.getElementById('bill-status').innerHTML = Object.keys(CARDS).map(function(k){
-    var v=CARDS[k], amt=totals[k]||0;
-    var ds = v.stmt>=day ? v.stmt-day : 31-day+v.stmt;
+  }
+  document.getElementById('sum-cards').innerHTML = sumHtml;
+  var day=new Date().getDate(), billHtml='';
+  for (var m=0;m<cardKeys.length;m++) {
+    var bk=cardKeys[m], bv=CARDS[bk], amt=totals[bk]||0;
+    var ds=bv.stmt>=day?bv.stmt-day:31-day+bv.stmt;
     var cls=ds<=2?'due':ds<=6?'warn':'ok';
     var icon=ds<=2?'🔴':ds<=6?'🟡':'✅';
-    return '<div class="bill-card '+cls+'"><div class="bill-top">'
-      +'<span class="bill-name">'+icon+' '+v.label+'</span>'
+    billHtml+='<div class="bill-card '+cls+'"><div class="bill-top">'
+      +'<span class="bill-name">'+icon+' '+bv.label+'</span>'
       +'<span class="bill-amt">'+fmt(amt)+'</span></div>'
       +'<div class="bill-detail">Statement in <strong>'+ds+' day'+(ds===1?'':'s')+'</strong>'
-      +' ('+v.stmt+ordinal(v.stmt)+') · Due: '+v.due+ordinal(v.due)+(v.nm?' next month':'')+'</div></div>';
-  }).join('');
-  var cats=Object.keys(catT).map(function(k){return [k,catT[k]];}).sort(function(a,b){return b[1]-a[1];});
-  document.getElementById('cat-prog').innerHTML = cats.length ? cats.map(function(pair){
-    var cat=pair[0],amt=pair[1],pct=grand>0?Math.round(amt/grand*100):0;
-    return '<div class="prog-item"><div class="prog-top">'
-      +'<span class="prog-name">'+catIcon(cat)+' '+cat+'</span>'
-      +'<span class="prog-val">'+fmt(amt)+' · '+pct+'%</span></div>'
+      +' ('+bv.stmt+ordinal(bv.stmt)+') · Due: '+bv.due+ordinal(bv.due)+(bv.nm?' next month':'')+'</div></div>';
+  }
+  document.getElementById('bill-status').innerHTML = billHtml;
+  var catArr=[];
+  for (var cat in catT) catArr.push([cat,catT[cat]]);
+  catArr.sort(function(a,b){return b[1]-a[1];});
+  var progHtml='';
+  for (var p=0;p<catArr.length;p++) {
+    var pcat=catArr[p][0],pamt=catArr[p][1],pct=grand>0?Math.round(pamt/grand*100):0;
+    progHtml+='<div class="prog-item"><div class="prog-top">'
+      +'<span class="prog-name">'+catIcon(pcat)+' '+pcat+'</span>'
+      +'<span class="prog-val">'+fmt(pamt)+' · '+pct+'%</span></div>'
       +'<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>';
-  }).join('') : '<div style="color:var(--text3);font-size:13px;padding:10px 0">No data yet</div>';
+  }
+  document.getElementById('cat-prog').innerHTML = progHtml || '<div style="color:var(--text3);font-size:13px;padding:10px 0">No data yet</div>';
 }
 
 function updateHeader() {
-  var grand=entries.reduce(function(s,e){return s+parseFloat(e.amt);},0);
+  var grand=0;
+  for(var i=0;i<entries.length;i++) grand+=parseFloat(entries[i].amt);
   var d=new Date();
   document.getElementById('hdr-sub').textContent =
     d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
@@ -366,12 +399,13 @@ function updateHeader() {
 }
 
 function switchTab(t) {
-  ['add','log','summary'].forEach(function(id){
-    document.getElementById('view-'+id).classList.toggle('active',id===t);
-    document.getElementById('tab-'+id).classList.toggle('active',id===t);
-  });
-  if (t==='log') renderLog();
-  if (t==='summary') renderSummary();
+  var tabs=['add','log','summary'];
+  for(var i=0;i<tabs.length;i++){
+    document.getElementById('view-'+tabs[i]).classList.toggle('active',tabs[i]===t);
+    document.getElementById('tab-'+tabs[i]).classList.toggle('active',tabs[i]===t);
+  }
+  if(t==='log') renderLog();
+  if(t==='summary') renderSummary();
 }
 
 function showToast(msg) {
@@ -380,9 +414,40 @@ function showToast(msg) {
   setTimeout(function(){el.classList.remove('show');},2400);
 }
 
+// ATTACH ALL EVENTS HERE — no onclick in HTML
+function attachEvents() {
+  // Card buttons
+  ['hdfc','sbi','onecard'].forEach(function(k) {
+    var el = document.getElementById('co-'+k);
+    el.addEventListener('click', function() { pickCard(k); });
+    el.addEventListener('touchend', function(e) { e.preventDefault(); pickCard(k); });
+  });
+
+  // Tab buttons
+  ['add','log','summary'].forEach(function(t) {
+    var el = document.getElementById('tab-'+t);
+    el.addEventListener('click', function() { switchTab(t); });
+  });
+
+  // Add button
+  document.getElementById('add-btn').addEventListener('click', addEntry);
+
+  // Clear button
+  document.getElementById('clr-btn').addEventListener('click', clearAll);
+
+  // Filter chips
+  var chips = document.querySelectorAll('.filter-chip');
+  for (var i=0;i<chips.length;i++) {
+    (function(chip) {
+      chip.addEventListener('click', function() { setFilter(chip.getAttribute('data-filter')); });
+    })(chips[i]);
+  }
+}
+
 // INIT
 loadData();
 buildCatGrid();
+attachEvents();
 document.getElementById('inp-date').value = todayStr();
 updateHeader();
 </script>
