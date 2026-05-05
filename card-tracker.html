@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Card Tracker" />
+<title>Card Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #F5F4F0;
+    --surface: #FFFFFF;
+    --surface2: #EFEFEA;
+    --border: rgba(0,0,0,0.09);
+    --border2: rgba(0,0,0,0.15);
+    --text: #1A1A18;
+    --text2: #6B6B66;
+    --text3: #A0A09A;
+    --hdfc: #1A56C4;
+    --hdfc-bg: #EBF0FC;
+    --hdfc-text: #0F3580;
+    --sbi: #267A3E;
+    --sbi-bg: #E8F5EC;
+    --sbi-text: #145227;
+    --one: #C05A10;
+    --one-bg: #FDF0E7;
+    --one-text: #7A3308;
+    --accent: #5B4FCF;
+    --accent-bg: #EDEAFC;
+    --accent-text: #2D2280;
+    --danger: #C0392B;
+    --danger-bg: #FDECEB;
+    --success: #267A3E;
+    --success-bg: #E8F5EC;
+    --warn: #C05A10;
+    --warn-bg: #FDF0E7;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    padding: calc(var(--safe-top) + 16px) 20px 14px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-row { display: flex; align-items: center; justify-content: space-between; }
+  .header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+  .header-sub { font-size: 12px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+  .clear-btn { font-size: 12px; color: var(--danger); background: var(--danger-bg); border: none; border-radius: 20px; padding: 5px 12px; font-family: var(--font); cursor: pointer; font-weight: 500; }
+
+  /* TABS */
+  .tab-bar {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+  }
+  .tab-item {
+    flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: 500;
+    color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .tab-item.active { color: var(--accent); border-color: var(--accent); }
+
+  /* CONTENT */
+  .content { padding: 16px 16px calc(var(--safe-bottom) + 80px); }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* SECTION LABEL */
+  .sec-label {
+    font-size: 10px; font-weight: 600; color: var(--text3);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin: 18px 0 8px 2px;
+  }
+  .sec-label:first-child { margin-top: 4px; }
+
+  /* CARD SELECTOR */
+  .card-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .card-opt {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .card-opt:active { transform: scale(0.97); }
+  .card-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-bottom: 4px; }
+  .card-name { font-size: 13px; font-weight: 600; display: block; }
+  .card-meta { font-size: 10px; color: var(--text3); margin-top: 2px; line-height: 1.5; }
+
+  .card-opt.sel-hdfc { border-color: var(--hdfc); background: var(--hdfc-bg); }
+  .card-opt.sel-hdfc .card-name { color: var(--hdfc-text); }
+  .card-opt.sel-sbi { border-color: var(--sbi); background: var(--sbi-bg); }
+  .card-opt.sel-sbi .card-name { color: var(--sbi-text); }
+  .card-opt.sel-onecard { border-color: var(--one); background: var(--one-bg); }
+  .card-opt.sel-onecard .card-name { color: var(--one-text); }
+
+  /* CATEGORY GRID */
+  .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+  .cat-opt {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 4px 8px;
+    cursor: pointer;
+    background: var(--surface);
+    text-align: center;
+    transition: all 0.12s;
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .cat-opt:active { transform: scale(0.95); }
+  .cat-opt .ci { font-size: 18px; display: block; margin-bottom: 3px; }
+  .cat-opt.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent-text); }
+
+  /* FORM */
+  .form-group { margin-bottom: 10px; }
+  .form-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; display: block; }
+  .form-input {
+    width: 100%; padding: 13px 14px;
+    border: 1.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 15px;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--text3); }
+  .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ADD BUTTON */
+  .add-btn {
+    width: 100%; padding: 15px;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: all 0.15s;
+    letter-spacing: -0.2px;
+  }
+  .add-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: calc(var(--safe-bottom) + 90px); left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: #fff; font-size: 13px; font-weight: 500;
+    padding: 10px 20px; border-radius: 30px; opacity: 0; transition: all 0.25s;
+    z-index: 999; white-space: nowrap; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ENTRIES */
+  .entry-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .entry-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-desc { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .entry-meta { font-size: 11px; color: var(--text3); margin-top: 2px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+  .badge-hdfc { background: var(--hdfc-bg); color: var(--hdfc-text); }
+  .badge-sbi { background: var(--sbi-bg); color: var(--sbi-text); }
+  .badge-onecard { background: var(--one-bg); color: var(--one-text); }
+  .entry-right { text-align: right; flex-shrink: 0; }
+  .entry-amt { font-family: var(--mono); font-size: 15px; font-weight: 500; }
+  .del-btn { font-size: 13px; color: var(--text3); background: none; border: none; cursor: pointer; padding: 2px 4px; display: block; margin-top: 3px; }
+  .del-btn:active { color: var(--danger); }
+  .empty-state { text-align: center; padding: 50px 20px; color: var(--text3); }
+  .empty-state .ei { font-size: 40px; margin-bottom: 10px; }
+  .empty-state p { font-size: 14px; }
+
+  /* FILTER */
+  .filter-row { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    white-space: nowrap; font-size: 12px; font-weight: 500;
+    padding: 6px 13px; border-radius: 20px;
+    border: 1px solid var(--border2); background: var(--surface);
+    cursor: pointer; color: var(--text2); flex-shrink: 0; transition: all 0.12s;
+  }
+  .filter-chip.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+  /* SUMMARY */
+  .sum-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+  .sum-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 10px; text-align: center; }
+  .sum-card-label { font-size: 10px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+  .sum-card-amt { font-family: var(--mono); font-size: 16px; font-weight: 500; margin-top: 4px; }
+  .sum-card-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .grand-total { background: var(--text); color: #fff; border-radius: var(--radius-sm); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .grand-label { font-size: 12px; font-weight: 600; opacity: 0.7; }
+  .grand-amt { font-family: var(--mono); font-size: 22px; font-weight: 500; }
+
+  /* BILL STATUS */
+  .bill-card { border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; border: 1px solid; }
+  .bill-card.ok { background: var(--success-bg); border-color: #9FE1CB; }
+  .bill-card.warn { background: var(--warn-bg); border-color: #FAC775; }
+  .bill-card.due { background: var(--danger-bg); border-color: #F7C1C1; }
+  .bill-top { display: flex; justify-content: space-between; align-items: center; }
+  .bill-name { font-size: 14px; font-weight: 600; }
+  .bill-amt { font-family: var(--mono); font-size: 14px; font-weight: 500; }
+  .bill-detail { font-size: 11px; margin-top: 5px; opacity: 0.75; line-height: 1.6; }
+
+  /* PROGRESS BARS */
+  .prog-item { margin-bottom: 12px; }
+  .prog-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+  .prog-name { color: var(--text2); font-weight: 500; }
+  .prog-val { color: var(--text3); font-family: var(--mono); }
+  .prog-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+
+  /* BOTTOM NAV feel padding */
+  .bottom-pad { height: calc(var(--safe-bottom) + 10px); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <div>
+      <h1>💳 Card Tracker</h1>
+      <div class="header-sub" id="hdr-sub">loading…</div>
+    </div>
+    <button class="clear-btn" onclick="clearAll()">Clear all</button>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab-item active" id="tab-add" onclick="switchTab('add')">Add Expense</div>
+  <div class="tab-item" id="tab-log" onclick="switchTab('log')">Log</div>
+  <div class="tab-item" id="tab-summary" onclick="switchTab('summary')">Summary</div>
+</div>
+
+<div class="content">
+
+  <!-- ADD TAB -->
+  <div class="view active" id="view-add">
+    <div class="sec-label">Select card</div>
+    <div class="card-row">
+      <div class="card-opt" id="co-hdfc" onclick="selCard('hdfc')">
+        <span class="card-dot" style="background:var(--hdfc)"></span>
+        <span class="card-name">HDFC</span>
+        <div class="card-meta">Stmt: 2nd<br>Due: 22nd</div>
+      </div>
+      <div class="card-opt" id="co-sbi" onclick="selCard('sbi')">
+        <span class="card-dot" style="background:var(--sbi)"></span>
+        <span class="card-name">SBI</span>
+        <div class="card-meta">Stmt: 7th<br>Due: 27th</div>
+      </div>
+      <div class="card-opt" id="co-onecard" onclick="selCard('onecard')">
+        <span class="card-dot" style="background:var(--one)"></span>
+        <span class="card-name">OneCard</span>
+        <div class="card-meta">Stmt: 22nd<br>Due: 9th↗</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Category</div>
+    <div class="cat-grid" id="cat-grid"></div>
+
+    <div class="sec-label">Details</div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" type="text" id="inp-desc" placeholder="e.g. Big Bazaar, Swiggy, BPCL…" autocomplete="off" />
+    </div>
+    <div class="form-row2">
+      <div class="form-group">
+        <label class="form-label">Amount (₹)</label>
+        <input class="form-input" type="number" id="inp-amt" placeholder="0" inputmode="decimal" min="0" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="form-input" type="date" id="inp-date" />
+      </div>
+    </div>
+
+    <button class="add-btn" onclick="addEntry()">+ Add Expense</button>
+    <div class="bottom-pad"></div>
+  </div>
+
+  <!-- LOG TAB -->
+  <div class="view" id="view-log">
+    <div class="sec-label">Filter by card</div>
+    <div class="filter-row" id="filter-row">
+      <div class="filter-chip active" data-f="all" onclick="setFilter(this,'all')">All</div>
+      <div class="filter-chip" data-f="hdfc" onclick="setFilter(this,'hdfc')">HDFC</div>
+      <div class="filter-chip" data-f="sbi" onclick="setFilter(this,'sbi')">SBI</div>
+      <div class="filter-chip" data-f="onecard" onclick="setFilter(this,'onecard')">OneCard</div>
+    </div>
+    <div id="log-list"></div>
+    <div class="bottom-pad"></div>
+  </div>
+
+  <!-- SUMMARY TAB -->
+  <div class="view" id="view-summary">
+    <div class="sec-label">Total outstanding</div>
+    <div class="grand-total">
+      <span class="grand-label">Grand Total</span>
+      <span class="grand-amt" id="grand-amt">₹0</span>
+    </div>
+    <div class="sum-cards" id="sum-cards"></div>
+
+    <div class="sec-label" style="margin-top:20px;">Bill cycle status</div>
+    <div id="bill-status"></div>
+
+    <div class="sec-label" style="margin-top:20px;">Spending by category</div>
+    <div id="cat-prog"></div>
+    <div class="bottom-pad"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS = [
+  { id:'Groceries',      icon:'🛒' },
+  { id:'Dining',         icon:'🍽️' },
+  { id:'Fuel',           icon:'⛽' },
+  { id:'Shopping',       icon:'🛍️' },
+  { id:'Travel',         icon:'✈️' },
+  { id:'Medical',        icon:'💊' },
+  { id:'Utilities',      icon:'💡' },
+  { id:'Insurance & EMI',icon:'🏦' },
+  { id:'Hotel & Stay',   icon:'🏨' },
+  { id:'Kids & Baby',    icon:'👶' },
+  { id:'Home & Maintenance', icon:'🔧' },
+  { id:'Gifts & Occasions', icon:'🎁' },
+  { id:'Subscriptions',  icon:'📱' },
+  { id:'Other',          icon:'📦' },
+];
+
+const CARDS = {
+  hdfc:    { label:'HDFC',    badge:'badge-hdfc',    stmt:2,  due:22, nextMonth:false },
+  sbi:     { label:'SBI',     badge:'badge-sbi',     stmt:7,  due:27, nextMonth:false },
+  onecard: { label:'OneCard', badge:'badge-onecard', stmt:22, due:9,  nextMonth:true  },
+};
+
+let entries = [];
+let selCard = null;
+let selCat  = null;
+let logFilter = 'all';
+let activeTab = 'add';
+
+function loadData() {
+  try { entries = JSON.parse(localStorage.getItem('ct_entries') || '[]'); } catch(e) { entries = []; }
+}
+function saveData() {
+  try { localStorage.setItem('ct_entries', JSON.stringify(entries)); } catch(e) {}
+}
+
+function buildCatGrid() {
+  const g = document.getElementById('cat-grid');
+  g.innerHTML = CATS.map(c => `
+    <div class="cat-opt" id="co-cat-${c.id.replace(/\s+/g,'_')}" onclick="pickCat('${c.id.replace(/'/g,"\\'")}')">
+      <span class="ci">${c.icon}</span>${c.id}
+    </div>`).join('');
+}
+
+function pickCat(id) {
+  selCat = id;
+  document.querySelectorAll('.cat-opt').forEach(e => e.classList.remove('active'));
+  const el = document.getElementById('co-cat-'+id.replace(/\s+/g,'_'));
+  if (el) el.classList.add('active');
+}
+
+function selCardFn(c) {
+  selCard = c;
+  ['hdfc','sbi','onecard'].forEach(k => {
+    const el = document.getElementById('co-'+k);
+    el.className = 'card-opt' + (k===c ? ' sel-'+k : '');
+  });
+}
+window.selCard = selCardFn;
+
+function today() {
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+}
+
+function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+function catIcon(id) { const c = CATS.find(x=>x.id===id); return c ? c.icon : '📦'; }
+
+function addEntry() {
+  const desc = document.getElementById('inp-desc').value.trim();
+  const amt  = parseFloat(document.getElementById('inp-amt').value);
+  const date = document.getElementById('inp-date').value || today();
+  if (!selCard) { showToast('Please select a card'); return; }
+  if (!selCat)  { showToast('Please select a category'); return; }
+  if (!desc)    { showToast('Add a description'); return; }
+  if (!amt || amt <= 0) { showToast('Enter a valid amount'); return; }
+  entries.push({ id: Date.now(), card: selCard, cat: selCat, desc, amt, date });
+  saveData();
+  document.getElementById('inp-desc').value = '';
+  document.getElementById('inp-amt').value  = '';
+  document.getElementById('inp-date').value = '';
+  showToast('Expense added ✓');
+  updateHeader();
+}
+
+function delEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  entries = entries.filter(e => e.id !== id);
+  saveData();
+  renderLog();
+  updateHeader();
+}
+
+function clearAll() {
+  if (!confirm('Clear all entries? This cannot be undone.')) return;
+  entries = [];
+  saveData();
+  renderLog();
+  renderSummary();
+  updateHeader();
+}
+
+function setFilter(el, f) {
+  logFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderLog();
+}
+
+function renderLog() {
+  const list = document.getElementById('log-list');
+  let data = [...entries].sort((a,b)=>b.id-a.id);
+  if (logFilter !== 'all') data = data.filter(e=>e.card===logFilter);
+  if (!data.length) {
+    list.innerHTML = `<div class="empty-state"><div class="ei">📭</div><p>No expenses yet.<br>Add one from the Add tab.</p></div>`;
+    return;
+  }
+  list.innerHTML = data.map(e => {
+    const c = CARDS[e.card];
+    const d = e.date ? e.date.split('-').reverse().slice(0,2).join('/') : '';
+    return `<div class="entry-item">
+      <div class="entry-icon">${catIcon(e.cat)}</div>
+      <div class="entry-body">
+        <div class="entry-desc">${e.desc}</div>
+        <div class="entry-meta">
+          <span class="badge ${c.badge}">${c.label}</span>
+          <span>${e.cat}</span>·<span>${d}</span>
+        </div>
+      </div>
+      <div class="entry-right">
+        <div class="entry-amt">${fmt(e.amt)}</div>
+        <button class="del-btn" onclick="delEntry(${e.id})">✕ remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSummary() {
+  const totals = { hdfc:0, sbi:0, onecard:0 };
+  const catT = {};
+  let grand = 0;
+  entries.forEach(e => {
+    totals[e.card] = (totals[e.card]||0) + e.amt;
+    catT[e.cat] = (catT[e.cat]||0) + e.amt;
+    grand += e.amt;
+  });
+
+  document.getElementById('grand-amt').textContent = fmt(grand);
+
+  document.getElementById('sum-cards').innerHTML = Object.entries(CARDS).map(([k,v]) =>
+    `<div class="sum-card">
+      <div class="sum-card-label">${v.label}</div>
+      <div class="sum-card-amt">${fmt(totals[k]||0)}</div>
+      <div class="sum-card-sub">Due ${v.due}${v.nextMonth?' →':'th'}</div>
+    </div>`).join('');
+
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  document.getElementById('bill-status').innerHTML = Object.entries(CARDS).map(([k,v]) => {
+    const amt = totals[k] || 0;
+    const daysToStmt = v.stmt >= dayOfMonth ? v.stmt - dayOfMonth : (31 - dayOfMonth + v.stmt);
+    let cls = 'ok', icon = '✅';
+    if (daysToStmt <= 2) { cls = 'due'; icon = '🔴'; }
+    else if (daysToStmt <= 6) { cls = 'warn'; icon = '🟡'; }
+    return `<div class="bill-card ${cls}">
+      <div class="bill-top">
+        <span class="bill-name">${icon} ${v.label}</span>
+        <span class="bill-amt">${fmt(amt)}</span>
+      </div>
+      <div class="bill-detail">
+        Statement in <strong>${daysToStmt} day${daysToStmt===1?'':'s'}</strong> (${v.stmt}${ordinal(v.stmt)}) · Due: ${v.due}${ordinal(v.due)}${v.nextMonth?' next month':''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const cats = Object.entries(catT).sort((a,b)=>b[1]-a[1]);
+  if (!cats.length) {
+    document.getElementById('cat-prog').innerHTML = '<div class="empty-state" style="padding:20px 0"><p>No data yet</p></div>';
+    return;
+  }
+  document.getElementById('cat-prog').innerHTML = cats.map(([cat,amt]) => {
+    const pct = grand > 0 ? Math.round(amt/grand*100) : 0;
+    return `<div class="prog-item">
+      <div class="prog-top">
+        <span class="prog-name">${catIcon(cat)} ${cat}</span>
+        <span class="prog-val">${fmt(amt)} · ${pct}%</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function ordinal(n) {
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return s[(v-20)%10] || s[v] || s[0];
+}
+
+function updateHeader() {
+  const grand = entries.reduce((s,e)=>s+e.amt,0);
+  const d = new Date();
+  document.getElementById('hdr-sub').textContent =
+    d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) +
+    ' · ' + entries.length + ' entries · ' + fmt(grand);
+}
+
+function switchTab(t) {
+  activeTab = t;
+  ['add','log','summary'].forEach(id => {
+    document.getElementById('view-'+id).classList.toggle('active', id===t);
+    document.getElementById('tab-'+id).classList.toggle('active', id===t);
+  });
+  if (t==='log') renderLog();
+  if (t==='summary') renderSummary();
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+// INIT
+loadData();
+buildCatGrid();
+document.getElementById('inp-date').value = today();
+updateHeader();
+</script>
+</body>
+</html>
